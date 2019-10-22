@@ -5,12 +5,14 @@
 # procedural generation algorithm and use print_rooms()
 # to see the world.
 
-
+import math
+import random
 class Room:
-    def __init__(self, id, name, description, x, y):
+    def __init__(self, id, name, description, objects, x, y):
         self.id = id
         self.name = name
         self.description = description
+        self.objects = [None]
         self.n_to = None
         self.s_to = None
         self.e_to = None
@@ -29,7 +31,6 @@ class Room:
         reverse_dir = reverse_dirs[direction]
         setattr(self, f"{direction}_to", connecting_room)
         setattr(connecting_room, f"{reverse_dir}_to", self)
-
     def get_room_in_direction(self, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -58,42 +59,63 @@ class World:
         x = -1 # (this will become 0 on the first step)
         y = 0
         room_count = 0
+        directions = ['n','w','e','s']
 
         # Start generating rooms to the east
-        direction = 1  # 1: east, -1: west
+        # direction = 1  # 1: east, -1: west
 
 
         # While there are rooms to be created...
         previous_room = None
         while room_count < num_rooms:
-
+        # insert for directions for each room
+            x +=1
+            if(x == self.width):
+               x = 0
+               y+=1
+            print('room:',room_count, 'x:',x , 'y:',y)
             # Calculate the direction of the room to be created
-            if direction > 0 and x < size_x - 1:
-                room_direction = "e"
-                x += 1
-            elif direction < 0 and x > 0:
-                room_direction = "w"
-                x -= 1
-            else:
-                # If we hit a wall, turn north and reverse direction
-                room_direction = "n"
-                y += 1
-                direction *= -1
+            allDirections = []
+            for i in range(0 , 4):
+                
+                 # check if room is at the beginning
+                next_movement = directions[i]
+                if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or (next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
+                    next_movement =  None
+                    allDirections.append(next_movement)
+                else:
+                    room_direction = next_movement
+                    allDirections.append(next_movement)
+            room_directions=list(filter(None ,allDirections))
+            print(room_directions)
+            room_count +=1   
+            # room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
+            # # Note that in Django, you'll need to save the room after you create it
 
-            # Create a room in the given direction
-            room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-            # Note that in Django, you'll need to save the room after you create it
-            print(room)
-            # Save the room in the World grid
+            # #Save the room in the World grid
             self.grid[y][x] = room
 
-            # Connect the new room to the previous room
+            # # Connect the new room to the previous room
             if previous_room is not None:
                 previous_room.connect_rooms(room, room_direction)
 
             # Update iteration variables
-            previous_room = room
-            room_count += 1
+            # previous_room = room
+            # room_count += 1
+            # if direction > 0 and x < size_x - 1:
+            #     room_direction = "e"
+            #     x += 1
+            # elif direction < 0 and x > 0:
+            #     room_direction = "w"
+            #     x -= 1
+            # else:
+            #     # If we hit a wall, turn north and reverse direction
+            #     room_direction = "n"
+            #     y += 1
+            #     direction *= -1
+
+            # # Create a room in the given direction
+
 
 
 
@@ -153,9 +175,9 @@ class World:
 
 
 w = World()
-num_rooms = 16
-width = 4
-height = 4
+num_rooms = 10
+width = 5
+height = 3
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 
