@@ -52,54 +52,52 @@ class World:
             self.grid[i] = [None] * size_x
 
         def random_direction():
-            return random.choice([1, 2, 3, 4])
+            return random.choice(['n','e','s','w'])
 
         # Start from middle of the map
         x = math.floor(size_x/2)
         y = math.floor(size_y/2)
         room_count = 0
-        
-        # While there are rooms to be created...
         previous_room = None
+        all_rooms = []
 
-        # rooms might overlap so loop n times num_rooms to have enough rooms
-        while room_count < num_rooms * 3:
-            direction = random_direction()
+        while room_count < num_rooms:
+            room_direction = random_direction()
 
             # Calculate the direction of the room to be created
-            if direction == 1 and y < size_y - 1:
-                room_direction = "n"
+            if room_direction == 'n' and y < size_y - 1:
                 y += 1
-            elif direction == 2 and x < size_x - 1:
-                room_direction = "e"
+            elif room_direction == 'e' and x < size_x - 1:
                 x += 1
-            elif direction == 3 and y > 0:
-                room_direction = "s"
+            elif room_direction == 's' and y > 0:
                 y -= 1                
-            elif direction == 4 and x > 0:
-                room_direction = "w"
+            elif room_direction == 'w' and x > 0:
                 x -= 1
+
+            # Save coordinates of all existing rooms
+            all_rooms.append([x, y])
 
             # Create a room in the given direction
             room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-            # Note that in Django, you'll need to save the room after you create it
-
-            # Save the room in the World grid only if there was no room already
-            if self.grid[y][x] is None:
-                self.grid[y][x] = room
 
             # Connect the new room to the previous room
             if previous_room is not None:
                 previous_room.connect_rooms(room, room_direction)
 
-            # Update iteration variables
-            previous_room = room
-            room_count += 1
+            # Note that in Django, you'll need to save the room after you create it
+            # Save the room in the World grid only if there was no room already
+            if self.grid[y][x] is None:
+                self.grid[y][x] = room
+                # Update iteration variables
+                previous_room = room
+                room_count += 1
 
-            # when 25 rooms have been created, restart generating rooms for the middle
-            if room_count % 25 == 0:
-                x = math.floor(size_x/2)
-                y = math.floor(size_y/2)
+            # when 10 rooms have been created, restart generating rooms from a random room
+            if room_count % 10 == 0:
+                r = random.choice(all_rooms)
+                x = r[0]
+                y = r[1]
+
 
 
 
