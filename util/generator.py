@@ -20,8 +20,8 @@ class Room:
         self.x = x
         self.y = y
     def __repr__(self):
-        if self.e_to is not None:
-            return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
+        # if self.e_to is not None:
+            # return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
         return f"({self.x}, {self.y})"
     def connect_rooms(self, connecting_room, direction):
         '''
@@ -43,6 +43,8 @@ class World:
         self.grid = None
         self.width = 0
         self.height = 0
+    def randomize_connections():
+        
     def generate_rooms(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
@@ -73,48 +75,39 @@ class World:
             if(x == self.width):
                x = 0
                y+=1
-            print('room:',room_count, 'x:',x , 'y:',y)
             # Calculate the direction of the room to be created
             allDirections = []
             for i in range(0 , 4):
-                
-                 # check if room is at the beginning
+                # check if room is at the beginning
                 next_movement = directions[i]
-                if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or (next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
+                if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or(next_movement == 'e' and room_count == num_rooms -1) or(next_movement == 'n' and (room_count + self.width) > num_rooms - 1 ) or ( next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
                     next_movement =  None
                     allDirections.append(next_movement)
                 else:
                     room_direction = next_movement
                     allDirections.append(next_movement)
             room_directions=list(filter(None ,allDirections))
-            print(room_directions)
-            room_count +=1   
-            # room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
+            room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
             # # Note that in Django, you'll need to save the room after you create it
-
             # #Save the room in the World grid
             self.grid[y][x] = room
-
             # # Connect the new room to the previous room
-            if previous_room is not None:
-                previous_room.connect_rooms(room, room_direction)
+            for i in room_directions:
+                if i == 'w':
+                    connected_room = Room(room_count-1 ,'Another Room','This is the previous',['objects'],x-1 , y )
+                if i == 'e':
+                    connected_room = Room(room_count+1 ,'Another Room','This is the previous',['objects'],x+1 , y )
+                if i == 'n':
+                    connected_room = Room(room_count+self.width ,'Another Room','This is the previous',['objects'],x , y+1)
+                if i == 's':
+                    connected_room = Room(room_count-self.width ,'Another Room','This is the previous',['objects'],x , y-1)
+                previous_room = connected_room
+                room.connect_rooms(previous_room, i)
+                previous_room = room
+            room_count +=1 
+            
 
-            # Update iteration variables
-            # previous_room = room
-            # room_count += 1
-            # if direction > 0 and x < size_x - 1:
-            #     room_direction = "e"
-            #     x += 1
-            # elif direction < 0 and x > 0:
-            #     room_direction = "w"
-            #     x -= 1
-            # else:
-            #     # If we hit a wall, turn north and reverse direction
-            #     room_direction = "n"
-            #     y += 1
-            #     direction *= -1
-
-            # # Create a room in the given direction
+      
 
 
 
@@ -175,9 +168,9 @@ class World:
 
 
 w = World()
-num_rooms = 10
-width = 5
-height = 3
+num_rooms = 196
+width = 15
+height = 14
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 

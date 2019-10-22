@@ -66,7 +66,7 @@ class World:
         # While there are rooms to be created...
         previous_room = None
         while room_count < num_rooms:
-
+            print('here')
             # Calculate the direction of the room to be created
             if direction > 0 and x < size_x - 1:
                 room_direction = "e"
@@ -79,14 +79,11 @@ class World:
                 room_direction = "n"
                 y += 1
                 direction *= -1
-
             # Create a room in the given direction
             room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
             # Note that in Django, you'll need to save the room after you create it
-            print(room)
             # Save the room in the World grid
             self.grid[y][x] = room
-
             # Connect the new room to the previous room
             if previous_room is not None:
                 previous_room.connect_rooms(room, room_direction)
