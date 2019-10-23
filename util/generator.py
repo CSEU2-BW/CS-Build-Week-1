@@ -30,8 +30,6 @@ class Room:
         reverse_dir = reverse_dirs[direction]
         setattr(self, f"{direction}_to", connecting_room)
         setattr(connecting_room, f"{reverse_dir}_to", self)
-    def disconnect_rooms(self , disconnected_room , direction):
-        pass
     def get_room_in_direction(self, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -44,6 +42,31 @@ class World:
         self.grid = None
         self.width = 0
         self.height = 0
+    def get_neighbours(self, x, y, size_x, size_y):      
+        '''
+        Get the neighbours of a room
+        '''
+        neighbours = [None, None, None, None]
+        if y < size_y - 1 and self.grid[y +1][x]:
+            neighbours[0] = self.grid[y +1][x]
+        elif y == size_y -1:
+            neighbours[0] = 'wall'
+
+        if y > 0 and self.grid[y - 1][x]:
+            neighbours[1] = self.grid[y - 1][x]
+        elif y == 0:
+            neighbours[1] = 'wall'
+    
+        if x < size_x - 1 and self.grid[y][x + 1]:
+            neighbours[3] = self.grid[y][x + 1]
+        elif x == size_x -1:
+            neighbours[3] = 'wall'
+
+        if x > 0 and self.grid[y][x - 1]:
+            neighbours[2] = self.grid[y][x - 1]
+        elif x == 0:
+            neighbours[2] = 'wall'
+        return neighbours
     def generate_rooms(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
@@ -68,11 +91,9 @@ class World:
 
         # While there are rooms to be created...
         previous_room = None
-        count = 0
-        toBeRemoved = []
-        value = None
+        coordinates =['n','s','w','e']
         while room_count < num_rooms:
-            coordinates =['n','w','e','s']
+            
         # insert for directions for each room
             x +=1
             if(x == self.width):
@@ -80,58 +101,46 @@ class World:
                y+=1
             # Calculate the direction of the room to be created
             allDirections = []
-            connected_room = None
+            connected_rooms = None
             room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
-            for i in coordinates:
-                if i == 'w':
-                    connected_room = Room(room_count-1 ,None,None,[None],x-1 , y )
-                if i == 'e':
-                    connected_room = Room(room_count+1 ,None,None,[None],x+1 , y )
-                if i == 'n':
-                    connected_room = Room(room_count+self.width ,None,None,[None],x , y+1)
-                if i == 's':
-                    connected_room = Room(room_count-self.width,None,None,[None],x , y-1)
-                  
-                next_movement = i
-                if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or(next_movement == 'e' and room_count == num_rooms -1) or(next_movement == 'n' and (room_count + self.width) > num_rooms - 1 ) or ( next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
-                    next_movement =  None
-                    allDirections.append(next_movement)
-                elif count == 3:
-                    if next_movement =='n':
-                        pass
-                        # print('here' ,room.n_to)
-                    if next_movement == 's':
-                        pass
-                        # room.get_room_in_direction('s').n_to = None
-                    if next_movement == 'e':
-                       pass
-                        # room.get_room_in_direction('e').w_to = None
-                    if next_movement == 'w':
-                        pass
-                        # room.get_room_in_direction('w').e_to = None
-                    next_movement = None
-                    allDirections.append(next_movement)
-                    count = 0
-                else:
-                    allDirections.append(next_movement)
-            count +=1
-            room_directions=list(filter(None ,allDirections))
-         
-
+            neighbours = self.get_neighbours(x, y, self.width, self.height)
             # print('room_id:',room.id , 'room:', room ,'directions:',room_directions)
             # # Note that in Django, you'll need to save the room after you create it
             # #Save the room in the World grid
             self.grid[y][x] = room
             # # Connect the new room to the previous room
-            
-            for i in room_directions:
+          
+            for index, neighbour in enumerate(neighbours):
             # Update iteration variables
-                previous_room = connected_room
-                room.connect_rooms(previous_room, i) 
-            room_count +=1
-        # print('\n',toBeRemoved)
 
-            
+                if(neighbour and neighbour !='wall'):
+                    if index == 1 :
+                        room.connect_rooms(neighbour ,'s')
+                    if index == 2 :
+                        room.connect_rooms(neighbour,'w')
+            room_count +=1
+
+        for row in self.grid:
+            count = 0
+            for room in row:
+                count += 1
+                direction = random.choice(['n', 's', 'e', 'w'])
+                if(room and count == 3):
+                    count = 0
+                    if(direction == 'n' and room.n_to ):
+                        room.n_to.s_to = None
+                        room.n_to = None
+                    if(direction == 's' and room.s_to ):
+                        room.s_to.n_to = None
+                        room.s_to = None
+                    if(direction == 'w' and room.w_to):
+                        room.w_to.e_to = None
+                        room.w_to = None
+                    if(direction == 'e' and room.e_to):
+                        room.e_to.w_to = None
+                        room.e_to = None
+
+         
 
       
 
@@ -194,9 +203,9 @@ class World:
 
 
 w = World()
-num_rooms = 20
-width = 5
-height = 4
+num_rooms = 86
+width = 8
+height = 11
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 
