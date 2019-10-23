@@ -30,6 +30,8 @@ class Room:
         reverse_dir = reverse_dirs[direction]
         setattr(self, f"{direction}_to", connecting_room)
         setattr(connecting_room, f"{reverse_dir}_to", self)
+    def disconnect_rooms(self , disconnected_room , direction):
+        pass
     def get_room_in_direction(self, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -58,7 +60,6 @@ class World:
         x = -1 # (this will become 0 on the first step)
         y = 0
         room_count = 0
-        coordinates = ['n','w','e','s']
        
 
         # Start generating rooms to the east
@@ -67,8 +68,11 @@ class World:
 
         # While there are rooms to be created...
         previous_room = None
+        count = 0
+        toBeRemoved = []
+        value = None
         while room_count < num_rooms:
-            
+            coordinates =['n','w','e','s']
         # insert for directions for each room
             x +=1
             if(x == self.width):
@@ -76,37 +80,57 @@ class World:
                y+=1
             # Calculate the direction of the room to be created
             allDirections = []
+            connected_room = None
             room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
-            max_move = random.choice([2,3, 4])
-            directions = random.sample(coordinates, max_move)
-           
-            
-            for i in range(0 ,len(directions)):
-                next_movement = directions[i]
+            for i in coordinates:
+                if i == 'w':
+                    connected_room = Room(room_count-1 ,None,None,[None],x-1 , y )
+                if i == 'e':
+                    connected_room = Room(room_count+1 ,None,None,[None],x+1 , y )
+                if i == 'n':
+                    connected_room = Room(room_count+self.width ,None,None,[None],x , y+1)
+                if i == 's':
+                    connected_room = Room(room_count-self.width,None,None,[None],x , y-1)
+                  
+                next_movement = i
                 if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or(next_movement == 'e' and room_count == num_rooms -1) or(next_movement == 'n' and (room_count + self.width) > num_rooms - 1 ) or ( next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
                     next_movement =  None
                     allDirections.append(next_movement)
+                elif count == 3:
+                    if next_movement =='n':
+                        pass
+                        # print('here' ,room.n_to)
+                    if next_movement == 's':
+                        pass
+                        # room.get_room_in_direction('s').n_to = None
+                    if next_movement == 'e':
+                       pass
+                        # room.get_room_in_direction('e').w_to = None
+                    if next_movement == 'w':
+                        pass
+                        # room.get_room_in_direction('w').e_to = None
+                    next_movement = None
+                    allDirections.append(next_movement)
+                    count = 0
                 else:
                     allDirections.append(next_movement)
+            count +=1
             room_directions=list(filter(None ,allDirections))
+         
 
             # print('room_id:',room.id , 'room:', room ,'directions:',room_directions)
             # # Note that in Django, you'll need to save the room after you create it
             # #Save the room in the World grid
             self.grid[y][x] = room
             # # Connect the new room to the previous room
+            
             for i in room_directions:
-                if i == 'w':
-                    connected_room = Room(room_count-1 ,'Another Room','This is the previous',['objects'],x-1 , y )
-                if i == 'e':
-                    connected_room = Room(room_count+1 ,'Another Room','This is the previous',['objects'],x+1 , y )
-                if i == 'n':
-                    connected_room = Room(room_count+self.width ,'Another Room','This is the previous',['objects'],x , y+1)
-                if i == 's':
-                    connected_room = Room(room_count-self.width ,'Another Room','This is the previous',['objects'],x , y-1)
+            # Update iteration variables
                 previous_room = connected_room
-                room.connect_rooms(previous_room, i)
-            room_count +=1 
+                room.connect_rooms(previous_room, i) 
+            room_count +=1
+        # print('\n',toBeRemoved)
+
             
 
       
@@ -170,9 +194,9 @@ class World:
 
 
 w = World()
-num_rooms = 100
-width = 10
-height = 10
+num_rooms = 20
+width = 5
+height = 4
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 
