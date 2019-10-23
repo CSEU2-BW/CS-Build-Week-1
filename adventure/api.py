@@ -75,6 +75,8 @@ def fetchRoom(request):
    rooms = Room.objects.all()
    serializedRooms = Serializer(rooms, many=True)
    if request.user:
-       return JsonResponse({'rooms':serializedRooms.data}, safe=True, status=200)
+       if len(rooms):
+           return JsonResponse({'rooms':serializedRooms.data}, safe=True, status=200)
+       return JsonResponse({'error': 'No rooms'}, safe=True, status=404)
    return JsonResponse({'error': 'User is not authorized'}, safe=True, status=403)
 
