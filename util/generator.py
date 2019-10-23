@@ -5,7 +5,6 @@
 # procedural generation algorithm and use print_rooms()
 # to see the world.
 
-import math
 import random
 class Room:
     def __init__(self, id, name, description, objects, x, y):
@@ -43,8 +42,6 @@ class World:
         self.grid = None
         self.width = 0
         self.height = 0
-    def randomize_connections():
-        
     def generate_rooms(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
@@ -61,7 +58,8 @@ class World:
         x = -1 # (this will become 0 on the first step)
         y = 0
         room_count = 0
-        directions = ['n','w','e','s']
+        coordinates = ['n','w','e','s']
+       
 
         # Start generating rooms to the east
         # direction = 1  # 1: east, -1: west
@@ -70,6 +68,7 @@ class World:
         # While there are rooms to be created...
         previous_room = None
         while room_count < num_rooms:
+            
         # insert for directions for each room
             x +=1
             if(x == self.width):
@@ -77,17 +76,21 @@ class World:
                y+=1
             # Calculate the direction of the room to be created
             allDirections = []
-            for i in range(0 , 4):
-                # check if room is at the beginning
+            room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
+            max_move = random.choice([2,3, 4])
+            directions = random.sample(coordinates, max_move)
+           
+            
+            for i in range(0 ,len(directions)):
                 next_movement = directions[i]
                 if (next_movement== 'w' and x == 0) or (next_movement== 'e' and x == self.width - 1) or(next_movement == 'e' and room_count == num_rooms -1) or(next_movement == 'n' and (room_count + self.width) > num_rooms - 1 ) or ( next_movement== 'n' and y == self.height -1) or (next_movement== 's' and y == 0):
                     next_movement =  None
                     allDirections.append(next_movement)
                 else:
-                    room_direction = next_movement
                     allDirections.append(next_movement)
             room_directions=list(filter(None ,allDirections))
-            room = Room(room_count, "A Generic Room", "This is a generic room.",['objects'], x, y)
+
+            # print('room_id:',room.id , 'room:', room ,'directions:',room_directions)
             # # Note that in Django, you'll need to save the room after you create it
             # #Save the room in the World grid
             self.grid[y][x] = room
@@ -103,7 +106,6 @@ class World:
                     connected_room = Room(room_count-self.width ,'Another Room','This is the previous',['objects'],x , y-1)
                 previous_room = connected_room
                 room.connect_rooms(previous_room, i)
-                previous_room = room
             room_count +=1 
             
 
@@ -168,9 +170,9 @@ class World:
 
 
 w = World()
-num_rooms = 196
-width = 15
-height = 14
+num_rooms = 100
+width = 10
+height = 10
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 
