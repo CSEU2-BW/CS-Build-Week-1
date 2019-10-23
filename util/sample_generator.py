@@ -30,6 +30,7 @@ class Room:
         reverse_dir = reverse_dirs[direction]
         setattr(self, f"{direction}_to", connecting_room)
         setattr(connecting_room, f"{reverse_dir}_to", self)
+
     def get_room_in_direction(self, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -62,10 +63,10 @@ class World:
         # While there are rooms to be created...
         previous_room = None
 
+
         # rooms might overlap so loop n times num_rooms to have enough rooms
         while room_count < num_rooms * 3:
             direction = random_direction()
-
             # Calculate the direction of the room to be created
             if direction == 1 and y < size_y - 1:
                 room_direction = "n"
@@ -79,6 +80,7 @@ class World:
             elif direction == 4 and x > 0:
                 room_direction = "w"
                 x -= 1
+
 
             # Create a room in the given direction
             room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
@@ -159,6 +161,7 @@ class World:
 
 
 w = World()
+
 num_rooms = 100
 width = 20
 height = 20
