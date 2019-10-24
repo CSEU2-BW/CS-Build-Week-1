@@ -227,7 +227,7 @@ class World:
             # Calculate the direction of the room to be created
             allDirections = []
             connected_rooms = None
-            room = Room(room_count, rooms[room_count]['title'],
+            room = Room(room_count + 1, rooms[room_count]['title'],
                         rooms[room_count]['description'], x, y)
 
             neighbours = self.get_neighbours(x, y, self.width, self.height)
@@ -270,14 +270,7 @@ class World:
                     if(direction == 'e' and room.e_to):
                         room.e_to.w_to = None
                         room.e_to = None
-                roomN = room.n_to.id if room.n_to != None else 0
-                roomS = room.s_to.id if room.s_to != None else 0
-                roomE = room.e_to.id if room.e_to != None else 0
-                roomW = room.w_to.id if room.w_to != None else 0
-                # print('room', room.id, room.name, room.description, roomN, roomS, roomE, roomW)
-                val = { 'id': room.id, 'name': room.name, 'description':room.description, 'roomN':roomN, 'roomS':roomS, 'roomE':roomE, 'roomW':roomW}
-                self.rooms.append(val)
-        return self.rooms
+
     
 
 
@@ -346,6 +339,7 @@ num_rooms = 100
 width = 10
 height = 10
 w.generate_rooms(width, height, num_rooms)
+w.print_rooms()
 
 
 print(
