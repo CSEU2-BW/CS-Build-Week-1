@@ -44,7 +44,7 @@ rooms = [
     {"title": "dungeon", "description": "You are in room: dungeon. Enjoy!"},
     {"title": "dormitory", "description": "You are in room: dormitory. Enjoy!"},
     {"title": "dressing room", "description": "You are in room: dressing room. Enjoy!"},
-    {"title": "entry", "description": "You are in room: entry. Enjoy!"},
+    {"title": "computer room", "description": "You are in room: computer room. Enjoy!"},
     {
         "title": "emergency room",
         "description": "You are in room: emergency room. Enjoy!",
@@ -254,7 +254,7 @@ class World:
 
                 count += 1
                 direction = random.choice(['n', 's', 'e', 'w'])
-                if(room and count == 3):
+                if(room and count == 2):
                     count = 0
                     if(direction == 'n' and room.n_to):
                         room.n_to.s_to = None
