@@ -142,8 +142,6 @@ class Room:
             # return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
         return f"({self.x}, {self.y})"
 
-    # def __str__(self):
-    #     return f"({self.name}, {self.description}, {self.n_to})"
 
     def connect_rooms(self, connecting_room, direction):
         '''
