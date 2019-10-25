@@ -5,8 +5,10 @@ from django.http import JsonResponse
 from decouple import config
 from django.contrib.auth.models import User
 from .models import *
+from .models import Room
 from rest_framework.decorators import api_view
 import json
+from .serializers import Serializer
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -65,3 +67,16 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error':"Not yet implemented"}, safe=True, status=500)
+
+# Get all the rooms
+@csrf_exempt
+@api_view(["GET"])
+def fetchRoom(request):
+   rooms = Room.objects.all()
+   serializedRooms = Serializer(rooms, many=True)
+   if request.user:
+       if len(rooms):
+           return JsonResponse({'rooms':serializedRooms.data}, safe=True, status=200)
+       return JsonResponse({'error': 'No rooms'}, safe=True, status=404)
+   return JsonResponse({'error': 'User is not authorized'}, safe=True, status=403)
+
