@@ -190,6 +190,7 @@ class World:
             neighbours[2] = self.grid[y][x - 1]
         elif x == 0:
             neighbours[2] = 'wall'
+        print(neighbours)
         return neighbours
 
     def generate_rooms(self, size_x, size_y, num_rooms):
