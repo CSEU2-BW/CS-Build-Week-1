@@ -214,8 +214,8 @@ class World:
         # direction = 1  # 1: east, -1: west
 
         # While there are rooms to be created...
-        previous_room = None
-        coordinates = ['n', 's', 'w', 'e']
+        # previous_room = None
+        # coordinates = ['n', 's', 'w', 'e']
         while room_count < num_rooms:
 
             # insert for directions for each room
@@ -224,8 +224,8 @@ class World:
                 x = 0
                 y += 1
             # Calculate the direction of the room to be created
-            allDirections = []
-            connected_rooms = None
+            # allDirections = []
+            # connected_rooms = None
             room = Room(room_count + 1, rooms[room_count]['title'],
                         rooms[room_count]['description'], x, y)
 
@@ -270,7 +270,44 @@ class World:
                         room.e_to.w_to = None
                         room.e_to = None
 
-    
+        def get_opposite(direction):
+            if direction == 'n_to':
+                return 's_to'
+            if direction == 's_to':
+                return 'n_to'
+            if direction == 'e_to':
+                return 'w_to'
+            if direction == 'w_to':
+                return 'e_to'
+
+        def get_opposite_x(direction, x):
+            if direction == 'e_to':
+                return x + 1
+            if direction == 'w_to':
+                return x - 1
+            return x           
+
+        def get_opposite_y(direction, y):
+            if direction == 'n_to':
+                return y + 1
+            if direction == 's_to':
+                return y - 1
+            return y
+
+        for row in self.grid:
+            for room in row:
+                if room.n_to and room.s_to and room.e_to and room.w_to:
+                    direction = random.choice(['n_to', 's_to', 'e_to', 'w_to'])
+                    opposite = get_opposite(direction)
+                    # room.n_to = None
+                    setattr(room, direction, None)
+                    # x = room.x
+                    # y = room.y+1
+                    x = get_opposite_x(direction, room.x)
+                    y = get_opposite_y(direction, room.y)
+                    # .s_to = None
+                    setattr(self.grid[y][x], opposite, None)
+                    # print('four walls')
 
 
     def print_rooms(self):
